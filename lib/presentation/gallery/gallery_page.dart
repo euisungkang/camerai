@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:cross_file/cross_file.dart';
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -161,10 +162,7 @@ class _GalleryPageState extends State<GalleryPage> {
                           children: [
                             CupertinoListTile.notched(
                               onTap: () async {
-                                var status = await Permission.camera.status;
-                                if (status.isDenied) {
-                                  await Permission.camera.request();
-                                }
+                                await Permission.camera.request();
                                 XFile? captureImage = await ImagePicker().pickImage(
                                   source: ImageSource.camera,
                                 );
@@ -192,9 +190,13 @@ class _GalleryPageState extends State<GalleryPage> {
                             ),
                             CupertinoListTile.notched(
                               onTap: () async {
-                                var status = await Permission.photos.status;
-                                if (status.isDenied) {
-                                  await Permission.photos.request();
+                                if (Platform.isAndroid) {
+                                  final androidInfo = await DeviceInfoPlugin().androidInfo;
+                                  if (androidInfo.version.sdkInt <= 32) {
+                                    Permission.storage.request();
+                                  }
+                                } else {
+                                  Permission.photos.request();
                                 }
                                 XFile? captureImage = await ImagePicker().pickImage(
                                   source: ImageSource.gallery,

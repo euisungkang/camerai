@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
@@ -24,7 +25,14 @@ void main() async {
   HttpOverrides.global = CustomHttpOverrides();
 
   await Permission.camera.request();
-  await Permission.photos.request();
+  if (Platform.isAndroid) {
+    final androidInfo = await DeviceInfoPlugin().androidInfo;
+    if (androidInfo.version.sdkInt <= 32) {
+      Permission.storage.request();
+    } else {
+      Permission.photos.request();
+    }
+  }
 
   await dotenv.load(fileName: 'assets/.env');
   await LoginToken().login();
@@ -61,7 +69,9 @@ class MyApp extends StatelessWidget {
               Locale('en', 'US'),
             ],
             title: 'camerai',
-            darkTheme: ThemeData.dark(
+            themeMode: ThemeMode.dark,
+            darkTheme: ThemeData(
+              brightness: Brightness.dark,
               useMaterial3: true,
             ),
             home: (LoginToken().accessToken == null && LoginToken().refreshToken == null)

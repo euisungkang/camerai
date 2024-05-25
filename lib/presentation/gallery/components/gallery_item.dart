@@ -30,6 +30,7 @@ class _GalleryItemPageState extends State<GalleryItem> {
     return GestureDetector(
       onTap: () async {
         ImageDetail item = await _imageRepository.getImageDetail(widget.image.imageUUID!);
+        print(item.imageUUID);
         await Navigator.push(
           context,
           MaterialPageRoute(

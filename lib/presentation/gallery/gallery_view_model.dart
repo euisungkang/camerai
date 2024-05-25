@@ -18,8 +18,8 @@ class GalleryViewModel with ChangeNotifier {
   }
 
   Future<void> postImage(File? file) async {
-    List<ImageBasic> images = await _imageRepository.postImages(file);
-    fileMap[images.first.imageUUID!] = file!;
+    await _imageRepository.postImages(file);
+    notifyListeners();
   }
 
   Future<String> analyzeDescription(String imageUUID, String imageUrl) async {
